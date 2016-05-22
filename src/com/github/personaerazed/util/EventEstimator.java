@@ -27,7 +27,7 @@ public class EventEstimator {
 
   public GlobalSurfacePosition getEstimatedPosition(LocalDateTime timestamp)
   {
-    LocalDateTime dateBefore = knownEvents.ceilingKey(timestamp);
+    LocalDateTime dateBefore = knownEvents.floorKey(timestamp);
     LocalDateTime dateAfter = knownEvents.higherKey(timestamp);
     double lat1 = knownEvents.get(dateBefore).getLatitude();
     double lon1 = knownEvents.get(dateBefore).getLongitude();
@@ -36,12 +36,12 @@ public class EventEstimator {
     ZoneOffset zOff = ZoneOffset.ofHours( // another estimation error
       (int)(Math.toDegrees(lon1*24/360))
     );
-    double frac = timestamp.toEpochSecond(zOff) /
+    double frac = (double)(timestamp.toEpochSecond(zOff)-dateBefore.toEpochSecond(zOff)) /
       (dateAfter.toEpochSecond(zOff)-dateBefore.toEpochSecond(zOff))
     ;
     return new GlobalSurfacePosition(
       (lat2-lat1)*frac + lat1,
-      (lon2-lon1)*frac + lon1, 'd'
+      (lon2-lon1)*frac + lon1, 'r'
     );
   }
 

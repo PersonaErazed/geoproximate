@@ -25,4 +25,7 @@ public class GlobalSurfacePosition {
   public double getLongitude() {
     return lon;
   }
+  public String toString() {
+    return "lat: "+toDegrees(lat)+"\u00B0; lon:  "+toDegrees(lon)+"\u00B0 ";
+  }
 }
