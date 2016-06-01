@@ -24,8 +24,8 @@ public class EventCoordListServlet extends HttpServlet  {
         worldModel.getEstimatedEventCoordinates(
         readDates(request.getParameter("timestampsUnkownPositions").split("\n"))
       );
-      out.println(worldModel.toString());
-      out.println(estimatedEvents.toString());
+      //out.println(worldModel.toString());
+      //out.println(estimatedEvents.toString());
       out.println(toJSON(estimatedEvents));
    }
    // make object events? MapTree<> ..
@@ -40,7 +40,7 @@ public class EventCoordListServlet extends HttpServlet  {
       GlobalSurfacePosition location;
       while (! eventsCopy.isEmpty() ) {
         // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33], "properties": {"prop0": "2016-04-07T13:21:08"}}
-        entry = eventsCopy.pullFirstEntry();
+        entry = eventsCopy.pollFirstEntry();
         timestamp = entry.getKey();
         location = entry.getValue();
         JSONObject point = new JSONObject();
@@ -49,7 +49,8 @@ public class EventCoordListServlet extends HttpServlet  {
         point.put("coordinates", coord);
         JSONObject feature = new JSONObject();
         feature.put("geometry", point);
-        JSONArray property = new JSONArray();
+        feature.put("type","Feature");
+        JSONObject property = new JSONObject();
         property.put("prop0",timestamp);
         feature.put("properties",property);
         featureList.put(feature);
@@ -57,6 +58,7 @@ public class EventCoordListServlet extends HttpServlet  {
       }
     } catch (JSONException e) {
     }
+    return featureCollection;
    }
    private ArrayList<LocalDateTime> readDates(String[] lines) {
      ArrayList<LocalDateTime> dates = new ArrayList<LocalDateTime>();

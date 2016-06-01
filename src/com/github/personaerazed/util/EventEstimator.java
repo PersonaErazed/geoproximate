@@ -34,14 +34,14 @@ public class EventEstimator {
     double lat2 = knownEvents.get(dateAfter).getLatitude();
     double lon2 = knownEvents.get(dateAfter).getLongitude();
     ZoneOffset zOff = ZoneOffset.ofHours( // another estimation error
-      (int)(Math.toDegrees(lon1*24/360))
+      (int)(lon1*24/360)
     );
     double frac = (double)(timestamp.toEpochSecond(zOff)-dateBefore.toEpochSecond(zOff)) /
       (dateAfter.toEpochSecond(zOff)-dateBefore.toEpochSecond(zOff))
     ;
     return new GlobalSurfacePosition(
       (lat2-lat1)*frac + lat1,
-      (lon2-lon1)*frac + lon1, 'r'
+      (lon2-lon1)*frac + lon1, 'd'
     );
   }
 

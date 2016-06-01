@@ -20,10 +20,10 @@ public class GlobalSurfacePosition {
     }
   }
   public double getLatitude() {
-    return lat;
+    return toDegrees(lat);
   }
   public double getLongitude() {
-    return lon;
+    return toDegrees(lon);
   }
   public String toString() {
     return "lat: "+toDegrees(lat)+"\u00B0; lon:  "+toDegrees(lon)+"\u00B0 ";
