@@ -28,7 +28,7 @@ public class EventCoordListServlet extends HttpServlet  {
     );
     out.print(toJSON(estimatedEvents));
    }
-
+   // make object events? MapTree<> ..
    private JSONObject toJSON(TreeMap<LocalDateTime,GlobalSurfacePosition> events) {
     TreeMap<LocalDateTime, GlobalSurfacePosition> eventsCopy = events;
     JSONObject featureCollection = new JSONObject();
