@@ -7,7 +7,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 import java.time.*;
 import java.time.format.*;
-import javax.json.*;
+import org.json.*;
 
 @WebServlet("/eventcoordinates")  
 public class EventCoordListServlet extends HttpServlet  {  
@@ -29,12 +29,12 @@ public class EventCoordListServlet extends HttpServlet  {
       out.println(toJSON(estimatedEvents));
    }
    // make object events? MapTree<> ..
-   private JsonObject toJSON(TreeMap<LocalDateTime,GlobalSurfacePosition> events) {
+   private JSONObject toJSON(TreeMap<LocalDateTime,GlobalSurfacePosition> events) {
     TreeMap<LocalDateTime, GlobalSurfacePosition> eventsCopy = events;
-    JsonObject featureCollection = new JsonObject();
+    JSONObject featureCollection = new JSONObject();
     try {
       featureCollection.put("type", "FeatureCollection");
-      JsonArray featureList = new JsonArray();
+      JSONArray featureList = new JSONArray();
       Map.Entry<LocalDateTime, GlobalSurfacePosition> entry;
       LocalDateTime timestamp;
       GlobalSurfacePosition location;
@@ -43,13 +43,13 @@ public class EventCoordListServlet extends HttpServlet  {
         entry = eventsCopy.pullFirstEntry();
         timestamp = entry.getKay();
         location = entry.getValue();
-        JsonObject point = new JsonObject();
+        JSONObject point = new JSONObject();
         point.put("type", "Point");
-        JsonArray coord = new JsonArray("["+location.getLongitude()+","+location.getLatitude()+"]");
+        JSONArray coord = new JSONArray("["+location.getLongitude()+","+location.getLatitude()+"]");
         point.put("coordinates", coord);
-        JsonObject feature = new JsonObject();
+        JSONObject feature = new JSONObject();
         feature.put("geometry", point);
-        JsonArray property = new JsonArray();
+        JSONArray property = new JSONArray();
         property.put("prop0",timestamp);
         feature.put("properties",property);
         featureList.put(feature);
