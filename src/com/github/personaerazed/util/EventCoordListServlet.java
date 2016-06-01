@@ -1,5 +1,4 @@
 package com.github.personaerazed.util;
-
 import java.io.*;  
 import java.util.*;
 import java.util.regex.*;
@@ -8,6 +7,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 import java.time.*;
 import java.time.format.*;
+import javax.json.*;
 
 @WebServlet("/eventcoordinates")  
 public class EventCoordListServlet extends HttpServlet  {  
@@ -19,33 +19,49 @@ public class EventCoordListServlet extends HttpServlet  {
      
       TreeMap<LocalDateTime,GlobalSurfacePosition> events =
         convertToTreeMap( request.getParameter("knownEvents").split("\n") );
-//      out.println(events);
       EventEstimator worldModel = new EventEstimator( events );
- /*
-     ArrayList<LocalDateTime> timestamps
-        = getDates(request.getParameter("timestampsUnkownPositions").split("\n"));
-
-      for (int i=0; i<timestamps.size(); i++) {
-        out.print(timestamps.get(i));
-        out.println(worldModel.getEstimatedPosition(timestamps.get(i)));
-      }
-*/
       TreeMap<LocalDateTime,GlobalSurfacePosition> estimatedEvents =
         worldModel.getEstimatedEventCoordinates(
-        getDates(request.getParameter("timestampsUnkownPositions").split("\n"))
+        readDates(request.getParameter("timestampsUnkownPositions").split("\n"))
       );
       out.println(worldModel.toString());
       out.println(estimatedEvents.toString());
-
-//      response.setContentType("text/HTML");    
-//      out.println(request.getParameter("knownEvents"));
-//      out.println(request.getParameter("timestampsUnkownPositions"));
-//      out.flush();  
+      out.println(toJSON(estimatedEvents));
    }
-   private ArrayList<LocalDateTime> getDates(String[] lines) {
+   // make object events? MapTree<> ..
+   private JsonObject toJSON(TreeMap<LocalDateTime,GlobalSurfacePosition> events) {
+    TreeMap<LocalDateTime, GlobalSurfacePosition> eventsCopy = events;
+    JsonObject featureCollection = new JsonObject();
+    try {
+      featureCollection.put("type", "FeatureCollection");
+      JsonArray featureList = new JsonArray();
+      Map.Entry<LocalDateTime, GlobalSurfacePosition> entry;
+      LocalDateTime timestamp;
+      GlobalSurfacePosition location;
+      while (! eventsCopy.isEmpty() ) {
+        // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33], "properties": {"prop0": "2016-04-07T13:21:08"}}
+        entry = eventsCopy.pullFirstEntry();
+        timestamp = entry.getKay();
+        location = entry.getValue();
+        JsonObject point = new JsonObject();
+        point.put("type", "Point");
+        JsonArray coord = new JsonArray("["+location.getLongitude()+","+location.getLatitude()+"]");
+        point.put("coordinates", coord);
+        JsonObject feature = new JsonObject();
+        feature.put("geometry", point);
+        JsonArray property = new JsonArray();
+        property.put("prop0",timestamp);
+        feature.put("properties",property);
+        featureList.put(feature);
+        featureCollection.put("features", featureList);
+      }
+    } catch (JSONException e) {
+    }
+   }
+   private ArrayList<LocalDateTime> readDates(String[] lines) {
      ArrayList<LocalDateTime> dates = new ArrayList<LocalDateTime>();
      for (int i=0; i<lines.length; i++) {
-       dates.add(getDate(lines[i]));
+       dates.add(readDate(lines[i]));
      }
      return dates;
    }
@@ -56,7 +72,7 @@ public class EventCoordListServlet extends HttpServlet  {
        = new TreeMap<LocalDateTime, GlobalSurfacePosition>();
      for (int i=0; i<lines.length; i++) {
        data.put(
-         getDate(lines[i]),
+         readDate(lines[i]),
          getPosition(lines[i])
        );
      }
@@ -66,7 +82,7 @@ public class EventCoordListServlet extends HttpServlet  {
      GSPFormatter f = new GSPFormatter();
      return f.parse(line);
    }
-   private LocalDateTime getDate(String line) {
+   private LocalDateTime readDate(String line) {
      DateFormat f = DateFormat.ISO_LOCAL_DATE_TIME;
      Matcher m = Pattern.compile( f.getRegex() ).matcher(line);
      if (m.find()) {
