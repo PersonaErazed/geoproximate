@@ -41,7 +41,7 @@ public class EventCoordListServlet extends HttpServlet  {
       while (! eventsCopy.isEmpty() ) {
         // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33], "properties": {"prop0": "2016-04-07T13:21:08"}}
         entry = eventsCopy.pullFirstEntry();
-        timestamp = entry.getKay();
+        timestamp = entry.getKey();
         location = entry.getValue();
         JSONObject point = new JSONObject();
         point.put("type", "Point");
