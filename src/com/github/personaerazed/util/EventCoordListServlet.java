@@ -11,14 +11,10 @@ import org.json.*;
 
 @WebServlet("/eventcoordinates")  
 public class EventCoordListServlet extends HttpServlet  {  
-   public void doGet(HttpServletRequest request,  
+  public void doPost(HttpServletRequest request,
                   HttpServletResponse response)  
                throws IOException,ServletException  {
-      
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
-    PrintWriter out = response.getWriter();
-     
+
     TreeMap<LocalDateTime,GlobalSurfacePosition> events =
       convertToTreeMap( request.getParameter("knownEvents").split("\n") );
     EventEstimator worldModel = new EventEstimator( events );
@@ -26,7 +22,11 @@ public class EventCoordListServlet extends HttpServlet  {
       worldModel.getEstimatedEventCoordinates(
       readDates(request.getParameter("timestampsUnkownPosition").split("\n"))
     );
-    out.print(toJSON(estimatedEvents));
+
+    JSONObject json = toJSON(estimatedEvents);
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    json.write(response.getWriter());
    }
 
    private JSONObject toJSON(TreeMap<LocalDateTime,GlobalSurfacePosition> events) {
