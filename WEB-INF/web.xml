@@ -12,12 +12,12 @@
      Welcome to Tomcat
   </description>
   <servlet>
-      <servlet-name>FirstServlet</servlet-name>
-      <servlet-class>com.github.personaerazed.util.FirstServlet</servlet-class>
+      <servlet-name>GPSCoordParseServlet</servlet-name>
+      <servlet-class>com.github.personaerazed.util.GPSCoordParseServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>FirstServlet</servlet-name>
-    <url-pattern>/FirstServlet</url-pattern>
+    <servlet-name>GPSCoordParseServlet</servlet-name>
+    <url-pattern>/gps-parse</url-pattern>
   </servlet-mapping>
 
   <servlet>
